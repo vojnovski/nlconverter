@@ -129,12 +129,12 @@ class NotesDocumentConverter(NotesDocumentReader):
 
 class NotesToMimeConverter(NotesDocumentConverter):
     """Convert a Memo Document to a Mime Message"""
-    charset = 'iso-8859-15' #default charset
+    charset = 'utf-8' #default charset
     charsetAttachment = 'utf-8' #attachment filename charset. Because Linux and Windows seems to use Utf-8 for filenames...
     
-    def stringToHeader(self, value):
+    def stringToHeader(self, value, charset=charset):
         """Build a Mail header value from a string""" 
-        return email.header.Header(value, self.charset)
+        return email.header.Header(value, charset)
         
     def header(self, doc, itemname):
         return self.stringToHeader(self.get1(doc, itemname))
