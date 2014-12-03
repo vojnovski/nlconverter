@@ -168,7 +168,7 @@ class NotesToMimeConverter(NotesDocumentConverter):
             m['Date'] = self.get1(doc, "DeliveredDate")
         ccc = self.toCcBccHeader(doc, "BlindCopyTo")
         if ccc != u'':
-            m['Ccc'] = ccc
+            m['Bcc'] = ccc
         m['User-Agent'] = self.header(doc, "$Mailer")
         m['Message-ID'] = self.header(doc, "$MessageID")
 
