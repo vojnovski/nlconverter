@@ -22,10 +22,7 @@ import time
 import mailbox
 
 #Regexp
-addressNotesDomainTable =  { 'dgi.finances.gouv.fr' : 'dgfip.finances.gouv.fr', }
-reGenericAddressNotes = re.compile(r'CN=(.*?)\s+(.*?)\/(.*?)O=(\w*?)\/C=(\w*)', re.IGNORECASE)
-reOU = re.compile(r'OU=(\w+?)\/', re.IGNORECASE)
-reAddressMail = re.compile(r'([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,6})', re.IGNORECASE)
+reGenericAddressNotes = re.compile(r'CN=(.*?)\/OU=(\w*?)\/O=(\w*)', re.IGNORECASE)
 notesDll = 'C:\\Program Files (x86)\\Amanotes\\nlsxbe.dll'
 
 def registerNotesDll():
@@ -80,20 +77,9 @@ class NotesDocumentReader(object):
         """Convert Notes Address Name Space into emails"""
         res = reGenericAddressNotes.search(value)
         if res == None:
-            res = reAddressMail.search(value)
-            if res == None:
                 return value.lower()
-            else :
-                return res.group(1)
         else :
-            mail = u"%s.%s@" % ( res.group(1).lower(), res.group(2).lower() )
-            subs = reOU.findall(res.group(3))
-            subs += res.groups()[3:]
-            suffix = ('.'.join(subs)).lower()
-            if addressNotesDomainTable.has_key(suffix):
-                suffix = addressNotesDomainTable[suffix]
-            mail += suffix
-            return mail.lower()
+                return res.group(1)
 
     def listAttachments(self, doc):
         """Return the list of the attachments, striping None and void names"""
