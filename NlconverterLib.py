@@ -26,14 +26,11 @@ addressNotesDomainTable =  { 'dgi.finances.gouv.fr' : 'dgfip.finances.gouv.fr', 
 reGenericAddressNotes = re.compile(r'CN=(.*?)\s+(.*?)\/(.*?)O=(\w*?)\/C=(\w*)', re.IGNORECASE)
 reOU = re.compile(r'OU=(\w+?)\/', re.IGNORECASE)
 reAddressMail = re.compile(r'([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,6})', re.IGNORECASE)
-#this list should be extended to match regular install path
-notesDllPathList = ['c:/notes', 'd:/notes']
+notesDll = 'C:\\Program Files (x86)\\Amanotes\\nlsxbe.dll'
 
 def registerNotesDll():
-    for p in notesDllPathList :
-        fp = os.path.join(p, 'nlsxbe.dll')
-        if os.path.exists(fp) and os.system("regsvr32 /s %s" % fp) == 0:
-            return True
+    if os.path.exists(notesDll) and os.system('regsvr32 /s "%s"' % notesDll) == 0:
+        return True
     return False
 
 def getNotesDb(notesNsfPath, notesPasswd):
