@@ -139,19 +139,34 @@ class NotesToMimeConverter(NotesDocumentConverter):
     def header(self, doc, itemname):
         return self.stringToHeader(self.get1(doc, itemname))
     
-    def addressHeader(self, doc, item):
-        items = self.get(doc, item)
-        return self.stringToHeader(",".join(map(self.matchAddress, items)))
-    
+    def toCcBccHeader(self, doc, headerType):
+        firstHeaders = map(self.matchAddress, self.get(doc, headerType))
+        secondHeaders = self.get(doc, "Inet" + headerType)
+        allHeaders = ",".join(tuple(a+" <" + b + ">" if (b!=u'' and b!=u'.') else a for a, b in zip(firstHeaders, secondHeaders)))
+        return self.stringToHeader(allHeaders)
+
+    def fromHeader(self, doc):
+        fromHeader = self.matchAddress(self.get1(doc, "From"))
+        principalHeader =self.matchAddress(self.get1(doc, "Principal"))
+        emailFromHeader = self.get1(doc, "InetFrom")
+
+        allFrom = fromHeader
+        if emailFromHeader != u'' and emailFromHeader != u'.':
+            allFrom += " <" + emailFromHeader + ">"
+        if not (fromHeader == principalHeader or principalHeader == u''):
+            allFrom = principalHeader + " (" + allFrom + ")"
+
+        return self.stringToHeader(allFrom)
+
     def messageHeaders(self, doc, m):
         m['Subject'] = self.header(doc, "Subject")
-        m['From'] = self.addressHeader(doc, "From")
-        m['To'] = self.addressHeader(doc, "sendto")
-        m['Cc'] = self.addressHeader(doc, "copyto")
+        m['From'] = self.fromHeader(doc)
+        m['To'] = self.toCcBccHeader(doc, "Sendto")
+        m['Cc'] = self.toCcBccHeader(doc, "Copyto")
         m['Date'] = self.get1(doc, "PostedDate")
         if m['Date'] == u'':
             m['Date'] = self.get1(doc, "DeliveredDate")
-        ccc = self.addressHeader(doc, "BlindCopyTo")
+        ccc = self.toCcBccHeader(doc, "BlindCopyTo")
         if ccc != u'':
             m['Ccc'] = ccc
         m['User-Agent'] = self.header(doc, "$Mailer")
