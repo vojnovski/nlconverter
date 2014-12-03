@@ -64,7 +64,7 @@ class NotesDocumentReader(object):
 
     def debug(self, doc):
         """Debug method : print message identifiers"""
-        self.debugItems(doc, ["Subject", "From", "To", "PostedDate", "DeliveredDate"])
+        self.debugItems(doc, ["Subject", "From", "Principal", "InetFrom", "To", "PostedDate", "DeliveredDate"])
 
     def debugItems(self, doc, itemlist):
         """Generic debug method"""
