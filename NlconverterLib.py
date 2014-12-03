@@ -11,6 +11,7 @@ import email.mime.base
 import email.header
 import mimetypes
 from email import encoders
+from email.Utils import formatdate
 
 import re #in order to parse addresses
 import tempfile #required for dealing with attachment
@@ -101,9 +102,12 @@ class NotesDocumentReader(object):
         a.ExtractFile(self.tempname)
         return self.tempname
 
-    def dateitem2datetime(self, doc, itemname):
-        datetuple = time.gmtime(int(self.get1(doc, itemname)) )[:5]
-        return datetime.datetime(*datetuple )
+    def dateitem2datetime2string2header(self, doc, itemname):
+        try:
+            datetuple = time.gmtime(int(self.get1(doc, itemname)) )[:5]
+        except Exception as e:
+            print self.debug(doc)
+        return self.stringToHeader(formatdate(time.mktime(datetime.datetime(*datetuple ).timetuple())), charset='ascii')
 
     def log(self, message = ""):
         print message
@@ -163,9 +167,9 @@ class NotesToMimeConverter(NotesDocumentConverter):
         m['From'] = self.fromHeader(doc)
         m['To'] = self.toCcBccHeader(doc, "Sendto")
         m['Cc'] = self.toCcBccHeader(doc, "Copyto")
-        m['Date'] = self.get1(doc, "PostedDate")
+        m['Date'] = self.dateitem2datetime2string2header(doc, "PostedDate")
         if m['Date'] == u'':
-            m['Date'] = self.get1(doc, "DeliveredDate")
+            m['Date'] = self.dateitem2datetime2string2header(doc, "DeliveredDate")
         ccc = self.toCcBccHeader(doc, "BlindCopyTo")
         if ccc != u'':
             m['Bcc'] = ccc
