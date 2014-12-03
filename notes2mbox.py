@@ -29,14 +29,12 @@ c = 0 #compteur de documents
 e = 0 #compteur d'erreur à la conversion
                
 mc = NlconverterLib.NotesToMboxConverter(notesNsfPath+".mbox")
-ic = NlconverterLib.NotesToIcalConverter(notesNsfPath+".ics")
 
 doc = all.GetFirstDocument()
 
 while doc and c < 100000 and e < 99999:
     try:
         mc.addDocument(doc)                
-        ic.addDocument(doc)
 
     except Exception, ex:
         e += 1 #compte les exceptions
@@ -51,4 +49,3 @@ while doc and c < 100000 and e < 99999:
 print "Exceptions a traiter manuellement:", e, "... documents OK : ", c
 
 mc.close()
-ic.close()

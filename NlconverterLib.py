@@ -15,8 +15,6 @@ from email import encoders
 import re #in order to parse addresses
 import tempfile #required for dealing with attachment
 
-#icalendar / time
-import icalendar
 import datetime
 import time
 
@@ -145,52 +143,6 @@ class NotesDocumentConverter(NotesDocumentReader):
 
     def close(self):
         pass
-
-
-class NotesToIcalConverter(NotesDocumentConverter):
-    formWhiteList = ['Appointment']
-    cal = None
-    filedescriptor = None
-
-    def __init__(self, icalfilename):
-        """open/init icalfilename"""
-        super(NotesToIcalConverter, self).__init__()
-        self.cal = icalendar.Calendar()
-        self.filedescriptor = open(icalfilename, 'wb')
-
-    def addDocument(self, doc):
-        if not super(NotesToIcalConverter, self).addDocument(doc):
-            return False
-        if self.filedescriptor == None :
-             self.log("ERROR: destination file not defined !!")
-        m = self.buildMessage(doc)
-        self.cal.add_component(m)
-        #self.debug(doc)
-        return True
-
-    def close(self):
-        self.filedescriptor.write(self.cal.as_string())
-        self.filedescriptor.close()
-
-    def matchAddress2vcal(self, address):
-        return icalendar.vCalAddress("MAILTO:%s" % self.matchAddress(address) )
-        
-    def buildMessage(self, doc):
-        event = icalendar.Event()
-        event['uid'] = self.get1(doc, "ApptUNID")
-        event.add('summary', self.get1(doc, 'Subject'))
-        event.add('dtstart', self.dateitem2datetime(doc, "StartDate"))
-        event.add('dtend', self.dateitem2datetime(doc, "EndDate"))
-        event.add('dtstamp', self.dateitem2datetime(doc, "StartDate"))
-        organizer =  self.matchAddress2vcal(self.get1(doc, "From") )
-        #FIXME : encoding is not correctly handled...
-        event.add('organizer' , organizer, encode='iso-8859-15')
-        for att in self.get(doc, "SendTo"):
-            attendee = self.matchAddress2vcal( att )
-            attendee.params['ROLE'] = icalendar.vText('REQ-PARTICIPANT')
-            event.add('attendee', attendee, encode='iso-8859-15')
-        return event
-
 
 class NotesToMimeConverter(NotesDocumentConverter):
     """Convert a Memo Document to a Mime Message"""
