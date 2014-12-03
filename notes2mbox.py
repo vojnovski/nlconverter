@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # hugues.bernard@gmail.com
+# viktor.vojnovski@gmail.com
 # Pour utiliser ce script :
 # * Installer python 2.6 pour windows
 # * Installer pywin 2.6 pour windows
